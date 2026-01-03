@@ -2,87 +2,87 @@
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
 
 local LP = Players.LocalPlayer
 
+-- BLUR
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = Lighting
+
 -- GUI
-local gui = Instance.new("ScreenGui", LP.PlayerGui)
-gui.Name = "BetterESP"
+local gui = Instance.new("ScreenGui")
+gui.Name = "HumMagKeyGUI"
 gui.ResetOnSpawn = false
+gui.Parent = LP:WaitForChild("PlayerGui")
 
--- Toggle Button
-local Toggle = Instance.new("TextButton", gui)
-Toggle.Size = UDim2.fromOffset(52,52)
-Toggle.Position = UDim2.fromScale(0.02,0.55)
-Toggle.Text = "ESP"
-Toggle.Font = Enum.Font.GothamBold
-Toggle.TextScaled = true
-Toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
-Toggle.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1,0)
-
--- Main Panel
-local Main = Instance.new("Frame", gui)
-Main.Size = UDim2.fromScale(0.45,0.45)
-Main.Position = UDim2.fromScale(0.1,0.25)
+-- MAIN BOX
+local Main = Instance.new("Frame")
+Main.Size = UDim2.fromScale(0.45, 0.25)
+Main.Position = UDim2.fromScale(0.275, 0.35)
 Main.BackgroundColor3 = Color3.fromRGB(18,18,18)
-Main.Visible = false
+Main.Parent = gui
 Main.Active = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0,20)
 
--- Stroke
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 20)
 local Stroke = Instance.new("UIStroke", Main)
 Stroke.Thickness = 2
-Stroke.Color = Color3.fromRGB(90,90,255)
+Stroke.Color = Color3.fromRGB(120,120,255)
 
--- Title
-local Title = Instance.new("TextLabel", Main)
-Title.Size = UDim2.new(1,0,0,50)
+-- TITLE
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,45)
 Title.BackgroundTransparency = 1
-Title.Text = "ESP PANEL"
+Title.Text = "HumMag Scripts"
 Title.Font = Enum.Font.GothamBold
 Title.TextScaled = true
 Title.TextColor3 = Color3.new(1,1,1)
+Title.Parent = Main
 
--- Scroll
-local Scroll = Instance.new("ScrollingFrame", Main)
-Scroll.Position = UDim2.new(0,0,0,50)
-Scroll.Size = UDim2.new(1,0,1,-50)
-Scroll.CanvasSize = UDim2.fromScale(0,1)
-Scroll.ScrollBarImageTransparency = 1
+-- KEY BOX
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.fromScale(0.85,0.28)
+KeyBox.Position = UDim2.fromScale(0.075,0.4)
+KeyBox.PlaceholderText = "Enter Key"
+KeyBox.Text = ""
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextScaled = true
+KeyBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
+KeyBox.TextColor3 = Color3.new(1,1,1)
+KeyBox.Parent = Main
+Instance.new("UICorner", KeyBox)
 
-local Layout = Instance.new("UIListLayout", Scroll)
-Layout.Padding = UDim.new(0,10)
-Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+-- SUBMIT BUTTON
+local Submit = Instance.new("TextButton")
+Submit.Size = UDim2.fromScale(0.6,0.22)
+Submit.Position = UDim2.fromScale(0.2,0.72)
+Submit.Text = "UNLOCK"
+Submit.Font = Enum.Font.GothamBold
+Submit.TextScaled = true
+Submit.BackgroundColor3 = Color3.fromRGB(50,50,90)
+Submit.TextColor3 = Color3.new(1,1,1)
+Submit.Parent = Main
+Instance.new("UICorner", Submit)
 
--- Button creator
-local function MakeToggle(text)
-	local b = Instance.new("TextButton", Scroll)
-	b.Size = UDim2.fromScale(0.9,0.14)
-	b.Text = text .. ": OFF"
-	b.Font = Enum.Font.Gotham
-	b.TextScaled = true
-	b.BackgroundColor3 = Color3.fromRGB(35,35,35)
-	b.TextColor3 = Color3.new(1,1,1)
-	Instance.new("UICorner", b)
-	return b
-end
+-- ERROR TEXT
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,0,0,30)
+Status.Position = UDim2.new(0,0,1,-30)
+Status.BackgroundTransparency = 1
+Status.Text = ""
+Status.Font = Enum.Font.Gotham
+Status.TextScaled = true
+Status.TextColor3 = Color3.fromRGB(255,100,100)
+Status.Parent = Main
 
--- Example toggles
-local NameESPBtn = MakeToggle("Name ESP")
-local BoxESPBtn = MakeToggle("Box ESP")
-local HighlightBtn = MakeToggle("Highlight ESP")
+-- BLUR IN
+TweenService:Create(blur, TweenInfo.new(0.4), {Size = 20}):Play()
 
--- Open / Close
-Toggle.MouseButton1Click:Connect(function()
-	Main.Visible = not Main.Visible
-end)
-
--- Drag (mobile safe)
-local dragging, startPos, dragStart
-
+-- DRAG (MOBILE SAFE)
+local dragging, dragStart, startPos
 Main.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
 		dragStart = i.Position
 		startPos = Main.Position
@@ -90,7 +90,7 @@ Main.InputBegan:Connect(function(i)
 end)
 
 UIS.InputChanged:Connect(function(i)
-	if dragging and (i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseMovement) then
+	if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
 		local delta = i.Position - dragStart
 		Main.Position = startPos + UDim2.fromOffset(delta.X, delta.Y)
 	end
@@ -98,4 +98,32 @@ end)
 
 UIS.InputEnded:Connect(function()
 	dragging = false
+end)
+
+-- KEY CHECK
+local CORRECT_KEY = "HumMagScripts1"
+
+Submit.MouseButton1Click:Connect(function()
+	if KeyBox.Text == CORRECT_KEY then
+		Status.TextColor3 = Color3.fromRGB(100,255,100)
+		Status.Text = "Access Granted"
+
+		-- UNLOCK ANIMATION
+		TweenService:Create(Main, TweenInfo.new(0.3), {
+			Size = UDim2.fromScale(0,0),
+			Position = UDim2.fromScale(0.5,0.5)
+		}):Play()
+
+		TweenService:Create(blur, TweenInfo.new(0.4), {Size = 0}):Play()
+
+		task.wait(0.35)
+		gui:Destroy()
+
+		-- 🔓 LOAD YOUR MAIN ESP UI HERE
+		print("HumMag Scripts Loaded")
+
+	else
+		Status.TextColor3 = Color3.fromRGB(255,80,80)
+		Status.Text = "Invalid Key"
+	end
 end)
